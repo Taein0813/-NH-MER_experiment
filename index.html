@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>음악 감정 평가 실험</title>
 
-  <!-- jsPsych core -->
-  <script src="https://unpkg.com/jspsych@7.3.4"></script>
-  <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" />
+  <!-- jsPsych core (✅ dist/jspsych.js 로 변경) -->
+  <script src="https://unpkg.com/jspsych@7.3.4/dist/jspsych.js"></script>
+  <link
+    href="https://unpkg.com/jspsych@7.3.4/dist/jspsych.css"
+    rel="stylesheet"
+  />
 
   <!-- plugins -->
   <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.3"></script>
@@ -17,7 +20,8 @@
     body {
       max-width: 1100px;
       margin: 0 auto;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+        sans-serif;
     }
 
     h1.main-title {
@@ -156,7 +160,8 @@
       .trial-layout {
         flex-direction: column;
       }
-      .left-pane, .right-pane {
+      .left-pane,
+      .right-pane {
         width: 100%;
       }
 
@@ -172,43 +177,47 @@
     }
   </style>
 </head>
-<body></body>
+<body>
+  <!-- jsPsych가 그려질 타겟 -->
+  <div id="jspsych-target"></div>
 
-<script>
-  // -----------------------------
-  // 0. Google Apps Script 웹앱 URL
-  // -----------------------------
-  const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbwAx7SoUNU8UWgo4UsFnyaZ_myc3lO8JQRlY7qFuk2r6HTFpD32_8IWiZwhcaNOVOPC2Q/exec";
+  <script>
+    // -----------------------------
+    // 0. Google Apps Script 웹앱 URL
+    // -----------------------------
+    const SUBMIT_URL =
+      "https://script.google.com/macros/s/AKfycbwAx7SoUNU8UWgo4UsFnyaZ_myc3lO8JQRlY7qFuk2r6HTFpD32_8IWiZwhcaNOVOPC2Q/exec";
 
-  // -----------------------------
-  // 1. jsPsych 초기화
-  // -----------------------------
-  const jsPsych = initJsPsych({
-    on_finish: function() {
-      const csv = jsPsych.data.get().csv();
+    // -----------------------------
+    // 1. jsPsych 초기화
+    // -----------------------------
+    const jsPsych = initJsPsych({
+      display_element: "jspsych-target",
+      on_finish: function () {
+        const csv = jsPsych.data.get().csv();
 
-      fetch(SUBMIT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          subject_id: subject_id,
-          csv: csv
-        })
-      });
-    }
-  });
+        fetch(SUBMIT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            subject_id: subject_id,
+            csv: csv,
+          }),
+        });
+      },
+    });
 
-  // 참가자 ID 생성 후 전체 데이터에 붙이기
-  const subject_id = jsPsych.randomization.randomID(10);
-  jsPsych.data.addProperties({ subject_id: subject_id });
+    // 참가자 ID 생성 후 전체 데이터에 붙이기
+    const subject_id = jsPsych.randomization.randomID(10);
+    jsPsych.data.addProperties({ subject_id: subject_id });
 
-  // -----------------------------
-  // 1-0. 시작 안내 창
-  // -----------------------------
-  const start_screen = {
-    type: jsPsychHtmlButtonResponse,
-    stimulus: `
+    // -----------------------------
+    // 1-0. 시작 안내 창
+    // -----------------------------
+    const start_screen = {
+      type: jsPsychHtmlButtonResponse,
+      stimulus: `
       <h1 class="main-title">음악 감정 평가 실험 안내</h1>
       <p style="text-align:left; margin-top:16px; line-height:1.7;">
         이 실험에서는 짧은 음악을 듣고, 각 음악이 전달하는 감정과 정서가(Valence), 각성도(Arousal)를 평가하게 됩니다.
@@ -229,15 +238,15 @@
         동의 여부 및 서명을 입력하는 화면으로 이동합니다.
       </p>
     `,
-    choices: ['다음으로 (동의서 확인 시작)']
-  };
+      choices: ["다음으로 (동의서 확인 시작)"],
+    };
 
-  // -----------------------------
-  // 1-1. 동의서 1: 인간대상 연구피험자 동의
-  // -----------------------------
-  const consent_human = {
-    type: jsPsychSurveyHtmlForm,
-    preamble: `
+    // -----------------------------
+    // 1-1. 동의서 1: 인간대상 연구피험자 동의
+    // -----------------------------
+    const consent_human = {
+      type: jsPsychSurveyHtmlForm,
+      preamble: `
       <h1 class="main-title">인간대상 연구피험자 동의서</h1>
       <p class="consent-text">
         먼저, 아래의 <strong>인간대상 연구피험자 동의서 전문(PDF 파일)</strong>을 스크롤하여 끝까지 읽어주세요.
@@ -250,7 +259,7 @@
         각 항목을 읽고 현재 본인의 의견에 해당하는 선택지를 골라 주세요.
       </p>
     `,
-    html: `
+      html: `
       <!-- 1) 개인정보 수집 동의 -->
       <div class="consent-section-title">[개인정보 수집에 대한 동의]</div>
       <p class="consent-text" style="margin-top:4px;">
@@ -348,24 +357,24 @@
         <input type="text" name="human_date" placeholder="예: 2025-11-28" required>
       </div>
     `,
-    button_label: "다음 (사례비 동의서로 이동)",
-    on_finish: function(data) {
-      const resp = data.response || {};
-      const main = resp["human_main_collect"] || "";
-      if (main.startsWith("동의하지")) {
-        jsPsych.endExperiment(
-          "개인정보 수집에 동의하지 않으셔서, 행동실험에 참여하실 수 없습니다.\n참여 의사를 검토해 주셔서 감사합니다."
-        );
-      }
-    }
-  };
+      button_label: "다음 (사례비 동의서로 이동)",
+      on_finish: function (data) {
+        const resp = data.response || {};
+        const main = resp["human_main_collect"] || "";
+        if (main.startsWith("동의하지")) {
+          jsPsych.endExperiment(
+            "개인정보 수집에 동의하지 않으셔서, 행동실험에 참여하실 수 없습니다.\n참여 의사를 검토해 주셔서 감사합니다."
+          );
+        }
+      },
+    };
 
-  // -----------------------------
-  // 1-2. 동의서 2: 사례비 지급용 동의
-  // -----------------------------
-  const consent_payment = {
-    type: jsPsychSurveyHtmlForm,
-    preamble: `
+    // -----------------------------
+    // 1-2. 동의서 2: 사례비 지급용 동의
+    // -----------------------------
+    const consent_payment = {
+      type: jsPsychSurveyHtmlForm,
+      preamble: `
       <h1 class="main-title">(사례비 지급 등)을 위한 개인정보 수집 및 활용 동의서</h1>
       <p class="consent-text">
         다음은 행동실험 참여에 따른 사례비 지급을 위해 필요한 <strong>개인정보 수집 및 활용에 대한 동의서</strong>입니다.<br>
@@ -390,7 +399,7 @@
         (이 실험에서는 두 동의서 모두에 동의하셔야 실험에 참여하실 수 있습니다.)
       </p>
     `,
-    html: `
+      html: `
       <div class="consent-section-title">[사례비 지급을 위한 개인정보 입력]</div>
 
       <div class="consent-input-row">
@@ -445,30 +454,30 @@
         연구자가 대리 서명하는 것에 동의한 것으로 간주합니다.
       </p>
     `,
-    button_label: "다음 (기초 정보 입력)",
-    on_finish: function(data) {
-      const resp = data.response || {};
-      const main = resp["payment_main_consent"] || "";
-      if (main.startsWith("동의하지")) {
-        jsPsych.endExperiment(
-          "사례비 지급을 위한 개인정보 수집·활용에 동의하지 않으셔서, 본 온라인 실험에 참여하실 수 없습니다.\n참여 의사를 검토해 주셔서 감사합니다."
-        );
-      }
-    }
-  };
+      button_label: "다음 (기초 정보 입력)",
+      on_finish: function (data) {
+        const resp = data.response || {};
+        const main = resp["payment_main_consent"] || "";
+        if (main.startsWith("동의하지")) {
+          jsPsych.endExperiment(
+            "사례비 지급을 위한 개인정보 수집·활용에 동의하지 않으셔서, 본 온라인 실험에 참여하실 수 없습니다.\n참여 의사를 검토해 주셔서 감사합니다."
+          );
+        }
+      },
+    };
 
-  // -----------------------------
-  // 1-3. 기초 정보: 생물학적 성별 / 만 나이 / 음악 전공 여부
-  // -----------------------------
-  const demographics = {
-    type: jsPsychSurveyHtmlForm,
-    preamble: `
+    // -----------------------------
+    // 1-3. 기초 정보: 생물학적 성별 / 만 나이 / 음악 전공 여부
+    // -----------------------------
+    const demographics = {
+      type: jsPsychSurveyHtmlForm,
+      preamble: `
       <h1 class="main-title">기초 정보 입력</h1>
       <p class="consent-text">
         다음은 연구 분석을 위한 기초 정보입니다. 아래 항목을 정확하게 입력해 주세요.
       </p>
     `,
-    html: `
+      html: `
       <div class="consent-input-row">
         <label>생물학적 성별 :</label>
         <label><input type="radio" name="bio_sex" value="남성" required> 남성</label>
@@ -488,81 +497,81 @@
         <label><input type="radio" name="major_status" value="음악 비전공자"> 음악 비전공자</label>
       </div>
     `,
-    button_label: "음악 실험 시작하기",
-    on_finish: function(data) {
-      const resp = data.response || {};
-      jsPsych.data.addProperties({
-        bio_sex: resp.bio_sex || null,
-        age: resp.age || null,
-        major_status: resp.major_status || null
-      });
-    }
-  };
-
-  // -----------------------------
-  // 2. 자극 목록 준비
-  // -----------------------------
-  const emotionGroups = ['calm', 'cheerful', 'dreamy', 'energetic', 'love', 'sad', 'tense'];
-
-  let stimuli = [];
-  let seqCounter = 1;
-
-  emotionGroups.forEach(em => {
-    ['C', 'S'].forEach(tag => {
-      for (let i = 1; i <= 5; i++) {
-        const num = String(i).padStart(2, '0');
-        stimuli.push({
-          file: `stims/${em}_${tag}${num}.mp3`,
-          base_emotion: em,
-          variant: `${tag}${num}`,
-          seq: seqCounter
+      button_label: "음악 실험 시작하기",
+      on_finish: function (data) {
+        const resp = data.response || {};
+        jsPsych.data.addProperties({
+          bio_sex: resp.bio_sex || null,
+          age: resp.age || null,
+          major_status: resp.major_status || null,
         });
-        seqCounter++;
-      }
+      },
+    };
+
+    // -----------------------------
+    // 2. 자극 목록 준비
+    // -----------------------------
+    const emotionGroups = ["calm", "cheerful", "dreamy", "energetic", "love", "sad", "tense"];
+
+    let stimuli = [];
+    let seqCounter = 1;
+
+    emotionGroups.forEach((em) => {
+      ["C", "S"].forEach((tag) => {
+        for (let i = 1; i <= 5; i++) {
+          const num = String(i).padStart(2, "0");
+          stimuli.push({
+            file: `stims/${em}_${tag}${num}.mp3`,
+            base_emotion: em,
+            variant: `${tag}${num}`,
+            seq: seqCounter,
+          });
+          seqCounter++;
+        }
+      });
     });
-  });
 
-  // 랜덤 순서
-  stimuli = jsPsych.randomization.shuffle(stimuli);
+    // 랜덤 순서
+    stimuli = jsPsych.randomization.shuffle(stimuli);
 
-  // seq 다시 부여
-  stimuli.forEach((s, idx) => {
-    s.seq = idx + 1;
-  });
+    // seq 다시 부여
+    stimuli.forEach((s, idx) => {
+      s.seq = idx + 1;
+    });
 
-  const TOTAL_TRIALS = stimuli.length;  // 70
+    const TOTAL_TRIALS = stimuli.length; // 70
 
-  // -----------------------------
-  // 3. 감정 슬라이더 라벨
-  // -----------------------------
-  const sliderEmotions = [
-    { code: "cheerful", label: "즐거운 (cheerful)" },
-    { code: "energetic", label: "에너지가 넘치는 (energetic)" },
-    { code: "in_love", label: "사랑에 빠진 (in love)" },
-    { code: "dreamy", label: "꿈꾸는 듯한 (dreamy)" },
-    { code: "calm", label: "평온한 (calm)" },
-    { code: "sad", label: "슬픈 (sad)" },
-    { code: "tense", label: "불안한 (tense)" }
-  };
+    // -----------------------------
+    // 3. 감정 슬라이더 라벨
+    // -----------------------------
+    const sliderEmotions = [
+      { code: "cheerful", label: "즐거운 (cheerful)" },
+      { code: "energetic", label: "에너지가 넘치는 (energetic)" },
+      { code: "in_love", label: "사랑에 빠진 (in love)" },
+      { code: "dreamy", label: "꿈꾸는 듯한 (dreamy)" },
+      { code: "calm", label: "평온한 (calm)" },
+      { code: "sad", label: "슬픈 (sad)" },
+      { code: "tense", label: "불안한 (tense)" },
+    ];
 
-  // -----------------------------
-  // 4. 한 곡당 한 화면 trial
-  // -----------------------------
-  const song_trial = {
-    type: jsPsychSurveyHtmlForm,
-    html: function() {
-      const file = jsPsych.timelineVariable('file');
-      const idx  = jsPsych.timelineVariable('seq');
+    // -----------------------------
+    // 4. 한 곡당 한 화면 trial
+    // -----------------------------
+    const song_trial = {
+      type: jsPsychSurveyHtmlForm,
+      html: function () {
+        const file = jsPsych.timelineVariable("file");
+        const idx = jsPsych.timelineVariable("seq");
 
-      const progressHTML = `
+        const progressHTML = `
         <div class="progress-text">
           곡 ${idx} / ${TOTAL_TRIALS}
         </div>
       `;
 
-      let sliderHTML = '';
-      sliderEmotions.forEach(em => {
-        sliderHTML += `
+        let sliderHTML = "";
+        sliderEmotions.forEach((em) => {
+          sliderHTML += `
           <div class="slider-row">
             <div><strong>${em.label}</strong></div>
             <input type="range"
@@ -575,9 +584,9 @@
             </div>
           </div>
         `;
-      });
+        });
 
-      const valenceSlider = `
+        const valenceSlider = `
         <div class="slider-row">
           <div><strong>Valence (정서가)</strong></div>
           <input type="range" name="valence" min="0" max="100" step="1" value="50" />
@@ -589,7 +598,7 @@
         </div>
       `;
 
-      const arousalSlider = `
+        const arousalSlider = `
         <div class="slider-row">
           <div><strong>Arousal (각성도)</strong></div>
           <input type="range" name="arousal" min="0" max="100" step="1" value="50" />
@@ -601,7 +610,7 @@
         </div>
       `;
 
-      return `
+        return `
         ${progressHTML}
 
         <div class="top-instruction">
@@ -648,54 +657,55 @@
           </div>
         </div>
       `;
-    },
-    button_label: "다음 곡으로",
-    data: {
-      file: jsPsych.timelineVariable('file'),
-      base_emotion: jsPsych.timelineVariable('base_emotion'),
-      variant: jsPsych.timelineVariable('variant'),
-      seq: jsPsych.timelineVariable('seq')
-    },
-    on_finish: function(data) {
-      const resp = data.response || {};
-      sliderEmotions.forEach(em => {
-        const val = resp[em.code];
-        data[em.code] = (val !== undefined && val !== null) ? Number(val) : null;
-      });
-      data.valence = resp.valence ? Number(resp.valence) : null;
-      data.arousal = resp.arousal ? Number(resp.arousal) : null;
-    }
-  };
+      },
+      button_label: "다음 곡으로",
+      data: {
+        file: jsPsych.timelineVariable("file"),
+        base_emotion: jsPsych.timelineVariable("base_emotion"),
+        variant: jsPsych.timelineVariable("variant"),
+        seq: jsPsych.timelineVariable("seq"),
+      },
+      on_finish: function (data) {
+        const resp = data.response || {};
+        sliderEmotions.forEach((em) => {
+          const val = resp[em.code];
+          data[em.code] = val !== undefined && val !== null ? Number(val) : null;
+        });
+        data.valence = resp.valence ? Number(resp.valence) : null;
+        data.arousal = resp.arousal ? Number(resp.arousal) : null;
+      },
+    };
 
-  const song_procedure = {
-    timeline: [song_trial],
-    timeline_variables: stimuli,
-    randomize_order: false
-  };
+    const song_procedure = {
+      timeline: [song_trial],
+      timeline_variables: stimuli,
+      randomize_order: false,
+    };
 
-  // -----------------------------
-  // 6. 종료 화면
-  // -----------------------------
-  const outro = {
-    type: jsPsychHtmlButtonResponse,
-    stimulus: `
+    // -----------------------------
+    // 6. 종료 화면
+    // -----------------------------
+    const outro = {
+      type: jsPsychHtmlButtonResponse,
+      stimulus: `
       <h2>실험이 완료되었습니다.</h2>
       <p>참여해 주셔서 감사합니다.</p>
       <p>종료 버튼을 누르면 응답이 저장됩니다.</p>
     `,
-    choices: ['종료']
-  };
+      choices: ["종료"],
+    };
 
-  // -----------------------------
-  // 7. 전체 타임라인 실행
-  // -----------------------------
-  jsPsych.run([
-    start_screen,
-    consent_human,
-    consent_payment,
-    demographics,
-    song_procedure,
-    outro
-  ]);
-</script>
+    // -----------------------------
+    // 7. 전체 타임라인 실행
+    // -----------------------------
+    jsPsych.run([
+      start_screen,
+      consent_human,
+      consent_payment,
+      demographics,
+      song_procedure,
+      outro,
+    ]);
+  </script>
+</body>
 </html>
