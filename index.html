@@ -522,6 +522,8 @@ const demographics = {
     // 버튼 아래에 안내 문구 추가
     const btn = document.querySelector('#jspsych-survey-html-form-next');
     if (btn) {
+      btn.style.marginTop = "28px";   // ← 기존보다 훨씬 넓게!
+      
       const note = document.createElement('p');
       note.className = 'consent-text';
       note.style.marginTop = '12px';
