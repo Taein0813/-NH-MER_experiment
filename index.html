@@ -512,6 +512,11 @@ const demographics = {
     </div>
 
     <div class="consent-input-row">
+      <label>하루 평균 음악 청취 시간 :</label>
+      <input type="text" name="time" placeholder="예: 30분, 2시간, ..." required>
+    </div>
+
+    <div class="consent-input-row">
       <label>음악 전공 여부 :</label>
       <label><input type="radio" name="major_status" value="음악 전공자" required> 음악 전공자</label>
       <label><input type="radio" name="major_status" value="음악 비전공자"> 음악 비전공자</label>
@@ -540,6 +545,7 @@ const demographics = {
     jsPsych.data.addProperties({
       bio_sex: resp.bio_sex || null,
       age: resp.age || null,
+      time: resp.time || null,    
       major_status: resp.major_status || null,
     });
   },
