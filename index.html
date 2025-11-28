@@ -488,51 +488,61 @@
       },
     };
 
-    // -----------------------------
-    // 1-3. 기초 정보: 생물학적 성별 / 만 나이 / 음악 전공 여부
-    // -----------------------------
-    const demographics = {
-      type: jsPsychSurveyHtmlForm,
-      preamble: `
-        <h1 class="main-title">기초 정보 입력</h1>
-        <p class="consent-text">
-          다음은 연구 분석을 위한 기초 정보입니다. 아래 항목을 정확하게 입력해 주세요.
-        </p>
+// -----------------------------
+// 1-3. 기초 정보: 생물학적 성별 / 만 나이 / 음악 전공 여부
+// -----------------------------
+const demographics = {
+  type: jsPsychSurveyHtmlForm,
+  preamble: `
+    <h1 class="main-title">기초 정보 입력</h1>
+    <p class="consent-text">
+      다음은 연구 분석을 위한 기초 정보입니다. 아래 항목을 정확하게 입력해 주세요.
+    </p>
+  `,
+  html: `
+    <div class="consent-input-row">
+      <label>생물학적 성별 :</label>
+      <label><input type="radio" name="bio_sex" value="남성" required> 남성</label>
+      <label><input type="radio" name="bio_sex" value="여성"> 여성</label>
+    </div>
 
-        <p class="consent-text" style="margin-top:14px; font-weight:600;">
-          * 중간에 나가시면 저장이 안됩니다. 한번에 끝까지 진행해 주세요!<br>
-          * 조용한 곳에서 가장 편한 방법으로 들어주세요.<br>
-          * 너무 오래 생각하지 마시고 직관적으로 평가해 주세요.
-        </p>
-      `,
-      html: `
-        <div class="consent-input-row">
-          <label>생물학적 성별 :</label>
-          <label><input type="radio" name="bio_sex" value="남성" required> 남성</label>
-          <label><input type="radio" name="bio_sex" value="여성"> 여성</label>
-        </div>
+    <div class="consent-input-row">
+      <label>만 나이 :</label>
+      <input type="text" name="age" placeholder="예: 32" required>
+    </div>
 
-        <div class="consent-input-row">
-          <label>만 나이 :</label>
-          <input type="text" name="age" placeholder="예: 32" required>
-        </div>
+    <div class="consent-input-row">
+      <label>음악 전공 여부 :</label>
+      <label><input type="radio" name="major_status" value="음악 전공자" required> 음악 전공자</label>
+      <label><input type="radio" name="major_status" value="음악 비전공자"> 음악 비전공자</label>
+    </div>
+  `,
+  button_label: "실험 시작하기",
+  on_load: function () {
+    // 버튼 아래에 안내 문구 추가
+    const btn = document.querySelector('#jspsych-survey-html-form-next');
+    if (btn) {
+      const note = document.createElement('p');
+      note.className = 'consent-text';
+      note.style.marginTop = '12px';
+      note.style.fontWeight = '600';
+      note.innerHTML =
+        '* 중간에 나가시면 저장이 안됩니다. 한번에 끝까지 진행해 주세요!<br>' +
+        '* 조용한 곳에서 가장 편한 방법으로 들어주세요.<br>' +
+        '* 너무 오래 생각하지 마시고 직관적으로 평가해 주세요.';
+      btn.insertAdjacentElement('afterend', note);
+    }
+  },
+  on_finish: function (data) {
+    const resp = data.response || {};
+    jsPsych.data.addProperties({
+      bio_sex: resp.bio_sex || null,
+      age: resp.age || null,
+      major_status: resp.major_status || null,
+    });
+  },
+};
 
-        <div class="consent-input-row">
-          <label>음악 전공 여부 :</label>
-          <label><input type="radio" name="major_status" value="음악 전공자" required> 음악 전공자</label>
-          <label><input type="radio" name="major_status" value="음악 비전공자"> 음악 비전공자</label>
-        </div>
-      `,
-      button_label: "실험 시작하기",
-      on_finish: function (data) {
-        const resp = data.response || {};
-        jsPsych.data.addProperties({
-          bio_sex: resp.bio_sex || null,
-          age: resp.age || null,
-          major_status: resp.major_status || null,
-        });
-      },
-    };
 
     // -----------------------------
     // 2. 자극 목록 준비
