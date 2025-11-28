@@ -77,11 +77,23 @@
     .slider-row {
       margin: 8px 0 14px 0;
       font-size: 13px;
+      position: relative; /* 가운데 선을 절대 위치로 찍기 위해 */
     }
 
     .slider-row input[type="range"] {
       width: 100%;
       margin-top: 4px;
+    }
+
+    /* 가운데 세로선 */
+    .slider-mid-line {
+      position: absolute;
+      left: 50%;
+      top: 26px;        /* 슬라이더 위치에 맞게 대략 조정 */
+      width: 1px;
+      height: 16px;
+      background-color: #999;
+      pointer-events: none; /* 클릭 방해 X */
     }
 
     .slider-label-line {
@@ -599,9 +611,10 @@
             <input type="range"
                    name="${em.code}"
                    min="0" max="100" step="1" value="0" />
+            <div class="slider-mid-line"></div>
             <div class="slider-label-line">
               <span>전혀 느껴지지 않음 (0)</span>
-              <span>중간 (50)</span>
+              <span></span>
               <span>매우 강하게 느껴짐 (100)</span>
             </div>
           </div>
@@ -612,9 +625,10 @@
         <div class="slider-row">
           <div><strong>Valence (정서가)</strong></div>
           <input type="range" name="valence" min="0" max="100" step="1" value="50" />
+          <div class="slider-mid-line"></div>
           <div class="slider-label-line">
             <span>매우 부정적인 (0)</span>
-            <span>중간 (50)</span>
+            <span></span>
             <span>매우 긍정적인 (100)</span>
           </div>
         </div>
@@ -624,9 +638,10 @@
         <div class="slider-row">
           <div><strong>Arousal (각성도)</strong></div>
           <input type="range" name="arousal" min="0" max="100" step="1" value="50" />
+          <div class="slider-mid-line"></div>
           <div class="slider-label-line">
             <span>매우 이완된, 차분한 (0)</span>
-            <span>중간 (50)</span>
+            <span></span>
             <span>매우 각성된, 강렬한 (100)</span>
           </div>
         </div>
