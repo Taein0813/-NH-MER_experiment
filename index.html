@@ -129,14 +129,14 @@
       color: #555;
     }
 
-    /* PDF 박스 */
+    /* PDF 박스: 모바일 대비 height + 스크롤 */
     .pdf-box {
       width: 100%;
-      height: 400px;
+      height: 70vh;
       border: 1px solid #ccc;
       border-radius: 6px;
-      overflow: hidden;
-      margin: 12px 0 16px;
+      overflow: auto;
+      margin: 12px 0 8px;
     }
 
     .pdf-box iframe {
@@ -273,6 +273,10 @@
       <div class="pdf-box">
         <iframe src="consent_human.pdf"></iframe>
       </div>
+      <p class="consent-text" style="font-size:12px; color:#444;">
+        ※ 모바일에서 PDF가 한 페이지만 보이거나 스크롤이 되지 않을 경우,
+        <a href="consent_human.pdf" target="_blank">여기를 눌러 새 탭에서 전체 동의서를 확인</a>해 주세요.
+      </p>
       <p class="consent-text">
         아래 문항들은 동의서 전문에서 <strong>피험자의 동의가 필요한 항목</strong>을 발췌한 것입니다.<br>
         각 항목을 읽고 현재 본인의 의견에 해당하는 선택지를 골라 주세요.
@@ -314,7 +318,7 @@
       <!-- 3) 개인식별정보 포함 여부 -->
       <div class="consent-section-title">[개인식별정보 포함 여부에 대한 동의]</div>
       <p class="consent-text" style="margin-top:4px;">
-        귀하가 개인정보제공에 대하여 동의시, 해당 정보는 익명화하여 제3자에게 제공되어집니다. 다만, 귀하가 개인식별정보를 포함하는 것에 동의한 경우에는 예외로 합니다.
+        귀하가 개인정보제공에 대하여 동의시, 해당 정보는 익명화하여 제3자에게 제공됩니다. 다만, 귀하가 개인식별정보를 포함하는 것에 동의한 경우에는 예외로 합니다.
       </p>
       <label>
         <input type="radio" name="human_identifiable" value="개인식별정보 포함 동의" required>
@@ -401,12 +405,16 @@
       <div class="pdf-box">
         <iframe src="consent_payment.pdf"></iframe>
       </div>
+      <p class="consent-text" style="font-size:12px; color:#444;">
+        ※ 모바일에서 PDF가 한 페이지만 보이거나 스크롤이 되지 않을 경우,
+        <a href="consent_payment.pdf" target="_blank">여기를 눌러 새 탭에서 전체 동의서를 확인</a>해 주세요.
+      </p>
       <p class="consent-text">
         아래는 동의서 중 <strong>핵심 정보</strong>를 요약한 것입니다.
       </p>
       <ul class="consent-text">
         <li>실험 시간 : <strong>30분</strong></li>
-        <li>사례비 : <strong>10,000원</strong></li>
+        <li>사례비 : <strong>10,000원(실험 종료 후 4~6주 이내 지급)</strong></li>
       </ul>
       <p class="consent-text">
         사례비 지급을 위해 수집되는 개인정보의 예시는 다음과 같습니다.<br>
@@ -488,69 +496,68 @@
       },
     };
 
-// -----------------------------
-// 1-3. 기초 정보: 생물학적 성별 / 만 나이 / 음악 전공 여부
-// -----------------------------
-const demographics = {
-  type: jsPsychSurveyHtmlForm,
-  preamble: `
-    <h1 class="main-title">기초 정보 입력</h1>
-    <p class="consent-text">
-      다음은 연구 분석을 위한 기초 정보입니다. 아래 항목을 정확하게 입력해 주세요.
-    </p>
-  `,
-  html: `
-    <div class="consent-input-row">
-      <label>생물학적 성별 :</label>
-      <label><input type="radio" name="bio_sex" value="남성" required> 남성</label>
-      <label><input type="radio" name="bio_sex" value="여성"> 여성</label>
-    </div>
+    // -----------------------------
+    // 1-3. 기초 정보: 생물학적 성별 / 만 나이 / 음악 전공 여부
+    // -----------------------------
+    const demographics = {
+      type: jsPsychSurveyHtmlForm,
+      preamble: `
+        <h1 class="main-title">기초 정보 입력</h1>
+        <p class="consent-text">
+          다음은 연구 분석을 위한 기초 정보입니다. 아래 항목을 정확하게 입력해 주세요.
+        </p>
+      `,
+      html: `
+        <div class="consent-input-row">
+          <label>생물학적 성별 :</label>
+          <label><input type="radio" name="bio_sex" value="남성" required> 남성</label>
+          <label><input type="radio" name="bio_sex" value="여성"> 여성</label>
+        </div>
 
-    <div class="consent-input-row">
-      <label>만 나이 :</label>
-      <input type="text" name="age" placeholder="예: 32" required>
-    </div>
+        <div class="consent-input-row">
+          <label>만 나이 :</label>
+          <input type="text" name="age" placeholder="예: 32" required>
+        </div>
 
-    <div class="consent-input-row">
-      <label>하루 평균 음악 청취 시간 :</label>
-      <input type="text" name="time" placeholder="예: 30분, 2시간, ..." required>
-    </div>
+        <div class="consent-input-row">
+          <label>하루 평균 음악 청취 시간 :</label>
+          <input type="text" name="time" placeholder="예: 30분, 2시간, ..." required>
+        </div>
 
-    <div class="consent-input-row">
-      <label>음악 전공 여부 :</label>
-      <label><input type="radio" name="major_status" value="음악 전공자" required> 음악 전공자</label>
-      <label><input type="radio" name="major_status" value="음악 비전공자"> 음악 비전공자</label>
-    </div>
-  `,
-  button_label: "실험 시작하기",
-  on_load: function () {
-    // 버튼 아래에 안내 문구 추가
-    const btn = document.querySelector('#jspsych-survey-html-form-next');
-    if (btn) {
-      btn.style.marginTop = "60px";   // ← 기존보다 훨씬 넓게!
-      
-      const note = document.createElement('p');
-      note.className = 'consent-text';
-      note.style.marginTop = '12px';
-      note.style.fontWeight = '600';
-      note.innerHTML =
-        '* 중간에 나가시면 저장이 안됩니다. 한번에 끝까지 진행해 주세요!<br>' +
-        '* 조용한 곳에서 가장 편한 방법으로 들어주세요.<br>' +
-        '* 너무 오래 생각하지 마시고 직관적으로 평가해 주세요.';
-      btn.insertAdjacentElement('afterend', note);
-    }
-  },
-  on_finish: function (data) {
-    const resp = data.response || {};
-    jsPsych.data.addProperties({
-      bio_sex: resp.bio_sex || null,
-      age: resp.age || null,
-      time: resp.time || null,    
-      major_status: resp.major_status || null,
-    });
-  },
-};
-
+        <div class="consent-input-row">
+          <label>음악 전공 여부 :</label>
+          <label><input type="radio" name="major_status" value="음악 전공자" required> 음악 전공자</label>
+          <label><input type="radio" name="major_status" value="음악 비전공자"> 음악 비전공자</label>
+        </div>
+      `,
+      button_label: "실험 시작하기",
+      on_load: function () {
+        // 버튼 아래에 안내 문구 추가
+        const btn = document.querySelector('#jspsych-survey-html-form-next');
+        if (btn) {
+          btn.style.marginTop = "60px";   // 위 질문들과 충분히 간격
+          
+          const note = document.createElement('p');
+          note.className = 'consent-text';
+          note.style.marginTop = '12px';
+          note.style.fontWeight = '600';
+          note.innerHTML =
+            '* 중간에 나가시면 저장이 안됩니다. 한번에 끝까지 진행해 주세요!<br>' +
+            '* 조용한 곳에서 가장 편한 방법으로 들어주세요.<br>' +
+            '* 너무 오래 생각하지 마시고 직관적으로 평가해 주세요.';
+          btn.insertAdjacentElement('afterend', note);
+        }
+      },
+      on_finish: function (data) {
+        const resp = data.response || {};
+        jsPsych.data.addProperties({
+          bio_sex: resp.bio_sex || null,
+          age: resp.age || null,
+          time: resp.time || null,
+          major_status: resp.major_status || null,
+        });
+      },
+    };
 
     // -----------------------------
     // 2. 자극 목록 준비
