@@ -752,6 +752,33 @@
         variant: jsPsych.timelineVariable("variant"),
         seq: jsPsych.timelineVariable("seq"),
       },
+
+      // ✅ 여기서 "Play를 한 번이라도 눌렀는지" 검사해서 아닌 경우 제출 막기
+      on_load: function () {
+        const idx   = jsPsych.timelineVariable("seq");
+        const audio = document.getElementById(`audio-${idx}`);
+        const nextBtn = document.getElementById("jspsych-survey-html-form-next");
+
+        let hasPlayed = false;
+
+        if (audio) {
+          // audio가 실제로 재생되면 플래그 true
+          audio.addEventListener("play", () => {
+            hasPlayed = true;
+          });
+        }
+
+        if (nextBtn) {
+          nextBtn.addEventListener("click", function (e) {
+            if (!hasPlayed) {
+              e.preventDefault();
+              e.stopPropagation();
+              alert("Play 버튼을 눌러 음악을 들어주시고, 감정 평가를 해주세요.");
+            }
+          });
+        }
+      },
+
       on_finish: function (data) {
         const resp = data.response || {};
         sliderEmotions.forEach((em) => {
