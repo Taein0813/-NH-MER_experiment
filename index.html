@@ -335,7 +335,7 @@ const jsPsych = initJsPsych({
       </label><br>
       <label>
         <input type="radio" name="human_provide_scope" value="제공에 동의하지 않음">
-        ▶ 동의하지 않습니다. (실험 참여 불가)
+        ▶ 동의하지 않습니다. 
       </label>
 
       <!-- 3) 개인식별정보 포함 여부 -->
@@ -349,7 +349,7 @@ const jsPsych = initJsPsych({
       </label><br>
       <label>
         <input type="radio" name="human_identifiable" value="개인식별정보 포함 동의하지 않음">
-        ▶ 동의하지 않습니다. (실험 참여 불가)
+        ▶ 동의하지 않습니다. 
       </label>
 
       <!-- 4) 새로운 정보 통보 여부 -->
@@ -403,39 +403,26 @@ const jsPsych = initJsPsych({
       </div>
     `,
       button_label: "다음 (사례비 동의서로 이동)",
-      on_finish: function (data) {
-        const resp = data.response || {};
+on_finish: function (data) {
+  const resp = data.response || {};
 
-        const main    = resp["human_main_collect"]  || "";
-        const provide = resp["human_provide_scope"] || "";
-        const ident   = resp["human_identifiable"]  || "";
-        // const notify  = resp["human_notify"]        || ""; // 통보 여부는 참여 가능/불가와 무관하다고 가정
+  const main    = resp["human_main_collect"]  || "";
+  const provide = resp["human_provide_scope"] || "";
+  const ident   = resp["human_identifiable"]  || "";
+  // const notify  = resp["human_notify"]        || ""; // 통보 여부는 참여 가능/불가와 무관
 
-        // 1) 개인정보 수집 동의 X → 종료
-        if (main.startsWith("동의하지")) {
-          jsPsych.endExperiment(
-            "개인정보 수집에 동의하지 않으셔서, 행동실험에 참여하실 수 없습니다.\n참여 의사를 검토해 주셔서 감사합니다."
-          );
-          return;
-        }
+  // 1) 개인정보 수집 동의 X → 종료 (이것만 체크)
+  if (main.startsWith("동의하지")) {
+    jsPsych.endExperiment(
+      "개인정보 수집에 동의하지 않으셔서, 행동실험에 참여하실 수 없습니다.\n참여 의사를 검토해 주셔서 감사합니다."
+    );
+    return;
+  }
 
-        // 2) 개인정보 제공 동의 X → 종료
-        if (provide.includes("동의하지")) {
-          jsPsych.endExperiment(
-            "개인정보 제공에 동의하지 않으셔서, 행동실험에 참여하실 수 없습니다.\n참여 의사를 검토해 주셔서 감사합니다."
-          );
-          return;
-        }
+  // 2) 개인정보 제공 / 개인식별정보 포함은
+  //    응답만 기록하고, 설문 진행은 계속되도록 아무 제약을 두지 않음
+}
 
-        // 3) 개인식별정보 포함 동의 X → 종료
-        if (ident.includes("동의하지")) {
-          jsPsych.endExperiment(
-            "개인식별정보 포함에 동의하지 않으셔서, 행동실험에 참여하실 수 없습니다.\n참여 의사를 검토해 주셔서 감사합니다."
-          );
-          return;
-        }
-      },
-    };
 
     // -----------------------------
     // 1-2. 동의서 2: 사례비 지급용 동의
