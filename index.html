@@ -6,7 +6,11 @@
 
   <!-- jsPsych core -->
   <script src="https://unpkg.com/jspsych@7.3.4"></script>
-  <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet"/>
+  <link
+    href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css"
+    rel="stylesheet"
+    type="text/css"
+  />
 
   <!-- plugins -->
   <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.3"></script>
@@ -17,7 +21,8 @@
     body {
       max-width: 1100px;
       margin: 0 auto;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+        sans-serif;
     }
 
     h1.main-title {
@@ -27,25 +32,17 @@
       line-height: 1.3;
     }
 
-    /* ✅ 제출 완료 화면 중앙 정렬 */
-    .center-screen {
-      min-height: 70vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      font-size: 20px;
-      font-weight: 600;
-      line-height: 1.8;
-    }
-
-    /* (이하 기존 스타일 그대로) */
     fieldset {
       margin-bottom: 20px;
       border: 1px dashed #a0a0a0;
       padding: 12px 18px;
       border-radius: 6px;
       background: #fafafa;
+    }
+
+    legend {
+      font-weight: 600;
+      padding: 0 6px;
     }
 
     .trial-layout {
@@ -55,8 +52,14 @@
       margin-top: 12px;
     }
 
-    .left-pane { flex: 1.2; }
-    .right-pane { flex: 1; }
+    .left-pane {
+      flex: 1.2;
+      text-align: left;
+    }
+
+    .right-pane {
+      flex: 1;
+    }
 
     .top-instruction {
       text-align: center;
@@ -67,10 +70,46 @@
       border-radius: 6px;
     }
 
-    .slider-row { margin: 8px 0 18px 0; font-size: 13px; }
+    .jspsych-btn {
+      padding: 6px 16px;
+    }
 
-    .slider-wrap { position: relative; width: 100%; }
-    .slider-wrap input[type="range"] { width: 100%; }
+    .slider-row {
+      margin: 8px 0 18px 0;
+      font-size: 13px;
+    }
+
+    .slider-label-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    .slider-label-line span {
+      flex: 1;
+      text-align: center;
+    }
+
+    .slider-label-line span:first-child {
+      text-align: left;
+    }
+
+    .slider-label-line span:last-child {
+      text-align: right;
+    }
+
+    /* 가운데 눈금용 래퍼 */
+    .slider-wrap {
+      position: relative;
+      width: 100%;
+      margin-top: 6px;
+    }
+
+    .slider-wrap input[type="range"] {
+      width: 100%;
+      margin: 0;
+    }
 
     .slider-wrap .mid-tick {
       position: absolute;
@@ -83,80 +122,713 @@
       pointer-events: none;
     }
 
-    .slider-label-line {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      margin-top: 4px;
-    }
-
     .progress-text {
       text-align: right;
       font-size: 13px;
-      margin: 6px 4px;
+      margin: 6px 4px 4px;
       color: #555;
+    }
+
+    /* PDF 박스: 모바일 대비 height + 스크롤 */
+    .pdf-box {
+      width: 100%;
+      height: 70vh;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      overflow: auto;
+      margin: 12px 0 8px;
+    }
+
+    .pdf-box iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .consent-text {
+      font-size: 13px;
+      margin-bottom: 8px;
+      line-height: 1.6;
+    }
+
+    .consent-section-title {
+      font-weight: 600;
+      margin: 10px 0 4px;
+      font-size: 14px;
+    }
+
+    .consent-input-row {
+      margin: 6px 0;
+      font-size: 13px;
+    }
+
+    .consent-input-row label {
+      display: inline-block;
+      min-width: 190px;
+    }
+
+    .consent-input-row input[type="text"] {
+      width: 60%;
+      max-width: 360px;
+      padding: 4px 6px;
+      font-size: 13px;
+    }
+
+    /* ✅ 모든 다음/종료 버튼을 화면 맨 아래와 띄우기 */
+    #jspsych-survey-html-form-next {
+      margin-bottom: 40px;
+    }
+    [id^="jspsych-html-button-response-button"] {
+      margin-bottom: 40px;
+    }
+
+    /* 반응형 */
+    @media (max-width: 900px) {
+      .trial-layout {
+        flex-direction: column;
+      }
+      .left-pane,
+      .right-pane {
+        width: 100%;
+      }
+
+      .consent-input-row label {
+        display: block;
+        margin-bottom: 2px;
+      }
+
+      .consent-input-row input[type="text"] {
+        width: 100%;
+        max-width: 100%;
+      }
     }
   </style>
 </head>
-
 <body>
+  <!-- jsPsych가 그려질 타겟 -->
   <div id="jspsych-target"></div>
 
   <script>
+    // -----------------------------
+    // 0. Google Apps Script 웹앱 URL
+    // -----------------------------
     const SUBMIT_URL =
       "https://script.google.com/macros/s/AKfycbwAx7SoUNU8UWgo4UsFnyaZ_myc3lO8JQRlY7qFuk2r6HTFpD32_8IWiZwhcaNOVOPC2Q/exec";
 
-    const jsPsych = initJsPsych({
-      display_element: "jspsych-target",
-      on_finish: function () {
-        const csv = jsPsych.data.get().csv();
+    // -----------------------------
+    // 1. jsPsych 초기화
+    // -----------------------------
+const jsPsych = initJsPsych({
+  display_element: "jspsych-target",
+  on_finish: function () {
 
-        const now = new Date();
-        fetch(SUBMIT_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            subject_id: subject_id,
-            csv: csv,
-            submitted_at: now.toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }),
-            submitted_iso: now.toISOString(),
-          }),
+    // ⭐ 1) jsPsych 전체 데이터를 CSV로
+    const csv = jsPsych.data.get().csv();
+
+    // ⭐ 2) 제출 시각 생성 (한국 시간 & ISO 둘 다)
+    const now = new Date();
+    const submitted_at = now.toLocaleString("ko-KR", {
+      timeZone: "Asia/Seoul",
+    });          // 예: "2025. 12. 8. 오전 11:23:45"
+    const submitted_iso = now.toISOString();  // 예: "2025-12-08T02:23:45.123Z"
+
+    // ⭐ 3) 시간 정보를 같이 보내기
+    fetch(SUBMIT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        subject_id: subject_id,
+        csv: csv,
+        submitted_at: submitted_at,     // ⭐ 추가
+        submitted_iso: submitted_iso,   // ⭐ 추가
+      }),
+    });
+  },
+});
+
+
+    // 참가자 ID 생성 후 전체 데이터에 붙이기
+    const subject_id = jsPsych.randomization.randomID(10);
+    jsPsych.data.addProperties({ subject_id: subject_id });
+
+    // -----------------------------
+    // 1-0. 시작 안내 창
+    // -----------------------------
+    const start_screen = {
+      type: jsPsychHtmlButtonResponse,
+      stimulus: `
+      <h1 class="main-title">음악 감정 평가 실험 안내</h1>
+      <p style="text-align:left; margin-top:16px; line-height:1.7;">
+        안녕하세요! 실험에 관심 가져 주셔서 감사합니다. 이 실험에서는 짧은 음악을 듣고, 각 음악이 전달하는 감정과 정서가(Valence), 각성도(Arousal)를 평가하게 됩니다.
+      </p>
+      <p style="text-align:left; margin-top:10px; line-height:1.7;">
+        본 실험에 참여하시기 위해서는, 다음 두 가지 동의서에 대한 내용을 읽고 동의 여부를 선택해 주셔야 합니다.
+      </p>
+      <ul style="text-align:left; line-height:1.7;">
+        <li><strong>① 인간대상 연구피험자 동의서</strong></li>
+        <li><strong>② (사례비 지급 등)을 위한 개인정보 수집 및 활용 동의서</strong></li>
+      </ul>
+      <p style="text-align:left; line-height:1.7; margin-top:8px;">
+        두 동의서 모두에 <strong>동의</strong>하셔야만 본 행동실험에 참여하실 수 있으며,<br>
+        동의하지 않으시는 경우 실험이 즉시 종료됩니다.
+      </p>
+      <p style="text-align:left; line-height:1.7; margin-top:8px;">
+        다음 버튼을 누르시면, 먼저 ① 인간대상 연구피험자 동의서(PDF)를 확인하신 뒤<br>
+        동의 여부 및 서명을 입력하는 화면으로 이동합니다.
+      </p>
+    `,
+      choices: ["다음으로 (동의서 확인 시작)"],
+    };
+
+    // -----------------------------
+    // 1-1. 동의서 1: 인간대상 연구피험자 동의
+    // -----------------------------
+    const consent_human = {
+      type: jsPsychSurveyHtmlForm,
+      preamble: `
+      <h1 class="main-title">인간대상 연구피험자 동의서</h1>
+      <p class="consent-text">
+        먼저, 아래의 <strong>인간대상 연구피험자 동의서 전문(PDF 파일)</strong>을 스크롤하여 끝까지 읽어주세요.
+      </p>
+      <div class="pdf-box">
+        <iframe src="consent_human.pdf"></iframe>
+      </div>
+      <p class="consent-text" style="font-size:12px; color:#444;">
+        ※ 모바일에서 PDF가 한 페이지만 보이거나 스크롤이 되지 않을 경우,
+        <a href="consent_human.pdf" target="_blank">여기를 눌러 새 탭에서 전체 동의서를 확인</a>해 주세요.
+      </p>
+      <p class="consent-text">
+        아래 문항들은 동의서 전문에서 <strong>피험자의 동의가 필요한 항목</strong>을 발췌한 것입니다.<br>
+        각 항목을 읽고 현재 본인의 의견에 해당하는 선택지를 골라 주세요. 
+        본 연구는 온라인으로 진행되므로, 응답을 제출하시면 본인은 전자적 방식(e-consent)으로 연구 참여 및 각 동의 항목에 동의하며, 
+        이에 따라 연구자가 본 동의서의 동의 항목 및 서명란을 본인을 대신하여 기재하는 것에 동의한 것으로 간주됩니다.
+      </p>
+    `,
+      html: `
+      <!-- 1) 개인정보 수집 동의 -->
+      <div class="consent-section-title">[개인정보 수집에 대한 동의]</div>
+      <p class="consent-text" style="margin-top:4px;">
+        본인은 개인정보 수집에 대한 내용을 확인하였으며, 본 연구에서 개인정보 수집에 대하여…
+      </p>
+      <label>
+        <input type="radio" name="human_main_collect" value="동의합니다" required>
+        ▶ 동의합니다.
+      </label><br>
+      <label>
+        <input type="radio" name="human_main_collect" value="동의하지 않습니다">
+        ▶ 동의하지 않습니다. (실험 참여 불가) <br>
+      </label>
+
+      <!-- 2) 개인정보 제공 범위 -->
+      <div class="consent-section-title">[개인정보의 제공에 관한 사항]</div>
+      <p class="consent-text" style="margin-top:4px;">
+        (타연구자에게 개인정보 제공이 있을 시) 본 연구에서 참여함으로써 수집되는 개인정보는 나이, 성별, 인공와우 이식 방향, 인공와우 사용 기간, 음악 경험 종류 및 기간이며, 해당 정보는 귀하의 동의에 따라 보존 기간내 2차적 사용을 위해 제공될 수 있습니다. 연구자는 타연구자에게 개인정보제공을 제공하는 경우에는 KAIST 생명윤리심의위원회에 개인정보제공에 관하여 별도 심의를 받아야 합니다.
+      </p>
+      <label>
+        <input type="radio" name="human_provide_scope" value="유사한 연구 범위 안에서만 제공 동의" required>
+        ▶ 유사한 연구 범위 안에서만 제공하는 것에 동의합니다.
+      </label><br>
+      <label>
+        <input type="radio" name="human_provide_scope" value="포괄적 연구 목적으로 제공 동의">
+        ▶ 포괄적 연구 목적으로 제공하는 것에 동의합니다.
+      </label><br>
+      <label>
+        <input type="radio" name="human_provide_scope" value="제공에 동의하지 않음">
+        ▶ 동의하지 않습니다. (실험 참여 불가)
+      </label>
+
+      <!-- 3) 개인식별정보 포함 여부 -->
+      <div class="consent-section-title">[개인식별정보 포함 여부에 대한 동의]</div>
+      <p class="consent-text" style="margin-top:4px;">
+        귀하가 개인정보제공에 대하여 동의시, 해당 정보는 익명화하여 제3자에게 제공됩니다. 다만, 귀하가 개인식별정보를 포함하는 것에 동의한 경우에는 예외로 합니다.
+      </p>
+      <label>
+        <input type="radio" name="human_identifiable" value="개인식별정보 포함 동의" required>
+        ▶ 개인식별정보를 포함하는 것에 동의합니다.
+      </label><br>
+      <label>
+        <input type="radio" name="human_identifiable" value="개인식별정보 포함 동의하지 않음">
+        ▶ 동의하지 않습니다. (실험 참여 불가)
+      </label>
+
+      <!-- 4) 새로운 정보 통보 여부 -->
+      <div class="consent-section-title">[연구 관련 새로운 정보 통보 여부]</div>
+      <p class="consent-text" style="margin-top:4px;">
+        본 연구진행 중 본인에게 영향을 줄 수도 있는 새로운 정보를 연구자가 획득 시 그 내용을 통보 받을 수 있습니다.
+      </p>
+      <label>
+        <input type="radio" name="human_notify" value="통보를 원함" required>
+        ▶ 통보를 원합니다.
+      </label><br>
+      <label>
+        <input type="radio" name="human_notify" value="통보를 원치 않음">
+        ▶ 통보를 원치 않습니다.
+      </label>
+
+      <!-- 5) 서명 및 기본 정보 입력 -->
+      <div class="consent-section-title" style="margin-top:16px;">[본인 확인 및 서명]</div>
+      <p class="consent-text">
+        본인은 이 동의서를 읽고 이해하였으며 모든 질문에 대한 답변을 들었습니다. 이에 본인은 자발적으로 본 연구에 참여함을 서명으로 확인합니다.
+      </p>
+      <p class="consent-text" style="margin-bottom:6px;">
+        또한, 본인은 <br>
+        1. 본인과 연구자 및 KAIST 사이에 본인의 연구 참여결정에 영향을 줄 수 있는 어떠한 관계도 없고, <br>
+        2. 요양원 같은 수용 시설에 거주하거나, 인지 기능에 문제가 있지 아니하며, <br>
+        3. 만약, 위에 열거한 1, 2의 상황에 해당되는 경우 생명윤리심의위원회 간사의 입회하에 본 동의서에 대한 설명을 듣고 아래 서명을 하였음을 확인합니다.
+      </p>
+
+      <div class="consent-input-row">
+        <label>주소 (동까지만 쓰셔도 됩니다) :</label>
+        <input type="text" name="human_addr" required>
+      </div>
+      <div class="consent-input-row">
+        <label>연락처 :</label>
+        <input type="text" name="human_phone" required>
+      </div>
+      <div class="consent-input-row">
+        <label>성명 :</label>
+        <input type="text" name="human_name" required>
+      </div>
+      <div class="consent-input-row">
+        <label>서명 또는 인 :</label>
+        <input type="text" name="human_sign" required>
+      </div>
+      <p class="consent-text" style="font-size:12px; margin-top:2px;">
+        *피험자가 직접 서명할 수 없는 온라인 실험이므로, (서명 또는 인)란 오른쪽에 본인 이름을 타이핑할 시 연구자가 대리 서명하는 것에 동의한 것으로 간주합니다.
+      </p>
+      <div class="consent-input-row">
+        <label>동의일자 :</label>
+        <input type="text" name="human_date" placeholder="예: 20251203" required>
+      </div>
+    `,
+      button_label: "다음 (사례비 동의서로 이동)",
+      on_finish: function (data) {
+        const resp = data.response || {};
+
+        const main    = resp["human_main_collect"]  || "";
+        const provide = resp["human_provide_scope"] || "";
+        const ident   = resp["human_identifiable"]  || "";
+        // const notify  = resp["human_notify"]        || ""; // 통보 여부는 참여 가능/불가와 무관하다고 가정
+
+        // 1) 개인정보 수집 동의 X → 종료
+        if (main.startsWith("동의하지")) {
+          jsPsych.endExperiment(
+            "개인정보 수집에 동의하지 않으셔서, 행동실험에 참여하실 수 없습니다.\n참여 의사를 검토해 주셔서 감사합니다."
+          );
+          return;
+        }
+
+        // 2) 개인정보 제공 동의 X → 종료
+        if (provide.includes("동의하지")) {
+          jsPsych.endExperiment(
+            "개인정보 제공에 동의하지 않으셔서, 행동실험에 참여하실 수 없습니다.\n참여 의사를 검토해 주셔서 감사합니다."
+          );
+          return;
+        }
+
+        // 3) 개인식별정보 포함 동의 X → 종료
+        if (ident.includes("동의하지")) {
+          jsPsych.endExperiment(
+            "개인식별정보 포함에 동의하지 않으셔서, 행동실험에 참여하실 수 없습니다.\n참여 의사를 검토해 주셔서 감사합니다."
+          );
+          return;
+        }
+      },
+    };
+
+    // -----------------------------
+    // 1-2. 동의서 2: 사례비 지급용 동의
+    // -----------------------------
+    const consent_payment = {
+      type: jsPsychSurveyHtmlForm,
+      preamble: `
+        <h1 class="main-title">(사례비 지급 등)을 위한 개인정보 수집 및 활용 동의서</h1>
+        <p class="consent-text">
+          다음은 행동실험 참여에 따른 사례비 지급을 위해 필요한 
+          <strong>개인정보 수집 및 활용 동의서</strong>입니다.<br>
+          아래의 동의서 전문(PDF 파일)을 스크롤하여 끝까지 읽어주세요.
+        </p>
+
+        <!-- PDF는 스크롤 박스만 유지 -->
+        <div class="pdf-box">
+          <iframe src="consent_payment.pdf"></iframe>
+        </div>
+
+        <p class="consent-text">
+          아래는 동의서 중 <strong>핵심 정보</strong>를 요약한 것입니다.
+          본 연구는 온라인으로 진행되므로, 응답을 제출하시면 본인은 전자적 방식(e-consent)으로 연구 참여 및 각 동의 항목에 동의하며, 
+          이에 따라 연구자가 본 동의서의 동의 항목 및 서명란을 본인을 대신하여 기재하는 것에 동의한 것으로 간주됩니다.
+        </p>
+        <ul class="consent-text">
+          <li>사례비 : <strong>10,000원 (실험 종료 후 4~6주 이내 지급)</strong></li>
+        </ul>
+        <p class="consent-text">
+          사례비 지급을 위해 수집되는 개인정보의 예시는 다음과 같습니다.<br>
+          성명, 주민등록번호(외부인의 경우 13자리), 연락처, 은행명 및 계좌번호, 주소(동까지) 등
+        </p>
+        <p class="consent-text">
+          <strong>▣ 미동의시 불이익 내용 :</strong> 연구 참여에 따른 사례비를 지급받을 수 없습니다.
+        </p>
+      `,
+      html: `
+        <div class="consent-section-title">[사례비 지급을 위한 개인정보 입력]</div>
+
+        <div class="consent-input-row">
+          <label>성명 :</label>
+          <input type="text" name="pay_name" required>
+        </div>
+        <div class="consent-input-row">
+          <label>주민등록번호 :</label>
+          <input type="text" name="pay_rrn" required>
+        </div>
+        <p class="consent-text" style="margin-top:2px; margin-left:190px; font-size:12px;">
+          (KAIST 내부인의 경우 앞 7자리, 외부인의 경우 13자리 모두 필요)
+        </p>
+
+        <div class="consent-input-row">
+          <label>연락처 :</label>
+          <input type="text" name="pay_phone" required>
+        </div>
+        <div class="consent-input-row">
+          <label>은행명, 계좌번호 :</label>
+          <input type="text" name="pay_bank_account" required>
+        </div>
+        <div class="consent-input-row">
+          <label>주소 (동까지만 쓰셔도 됩니다) :</label>
+          <input type="text" name="pay_addr" required>
+        </div>
+
+        <div class="consent-section-title" style="margin-top:14px;">[개인정보 수집 및 활용에 대한 동의]</div>
+        <p class="consent-text">
+          본인은 위와 같이 본인의 개인정보에 대한 수집 및 활용에 대한 내용을 확인하였으며,
+          개인정보 수집 및 활용에 대하여…
+        </p>
+        <label>
+          <input type="radio" name="payment_main_consent" value="동의합니다" required>
+          ▶ 동의합니다.
+        </label><br>
+        <label>
+          <input type="radio" name="payment_main_consent" value="동의하지 않습니다">
+          ▶ 동의하지 않습니다. (실험 참여 불가)
+        </label>
+
+        <div class="consent-section-title" style="margin-top:14px;">[동의일자 및 서명]</div>
+        <div class="consent-input-row">
+          <label>동의일자 (20  .  .  . ) :</label>
+          <input type="text" name="pay_date" placeholder="예: 20251203" required>
+        </div>
+        <div class="consent-input-row">
+          <label>피험자(동의자) 성명 :</label>
+          <input type="text" name="pay_sign_name" required>
+        </div>
+        <div class="consent-input-row">
+          <label>서명 :</label>
+          <input type="text" name="pay_sign" required>
+        </div>
+        <p class="consent-text" style="font-size:12px; margin-top:2px;">
+          *피험자가 직접 서명할 수 없는 온라인 실험이므로, (서명)란 오른쪽에 본인 이름을 타이핑할 시
+          연구자가 대리 서명하는 것에 동의한 것으로 간주합니다.
+        </p>
+      `,
+      button_label: "다음 (기초 정보 입력)",
+      on_finish: function (data) {
+        const resp = data.response || {};
+        const main = resp["payment_main_consent"] || "";
+        if (main.startsWith("동의하지")) {
+          jsPsych.endExperiment(
+            "사례비 지급을 위한 개인정보 수집·활용에 동의하지 않으셔서, 본 온라인 실험에 참여하실 수 없습니다.\n참여 의사를 검토해 주셔서 감사합니다."
+          );
+        }
+      },
+    };
+
+    // -----------------------------
+    // 1-3. 기초 정보: 생물학적 성별 / 만 나이 / 음악 전공 여부
+    // -----------------------------
+    const demographics = {
+      type: jsPsychSurveyHtmlForm,
+      preamble: `
+        <h1 class="main-title">기초 정보 입력</h1>
+        <p class="consent-text">
+          다음은 연구 분석을 위한 기초 정보입니다. 아래 항목을 정확하게 입력해 주세요.
+        </p>
+      `,
+      html: `
+        <div class="consent-input-row">
+          <label>생물학적 성별 :</label>
+          <label><input type="radio" name="bio_sex" value="남성" required> 남성</label>
+          <label><input type="radio" name="bio_sex" value="여성"> 여성</label>
+        </div>
+
+        <div class="consent-input-row">
+          <label>만 나이 :</label>
+          <input type="text" name="age" placeholder="예: 32" required>
+        </div>
+
+        <div class="consent-input-row">
+          <label>하루 평균 음악 청취 시간 :</label>
+          <input type="text" name="time" placeholder="예: 30분, 2시간, ..." required>
+        </div>
+
+        <div class="consent-input-row">
+          <label>음악 전공 여부 :</label>
+          <label><input type="radio" name="major_status" value="음악 전공자" required> 음악 전공자</label>
+          <label><input type="radio" name="major_status" value="음악 비전공자"> 음악 비전공자</label>
+        </div>
+      `,
+      button_label: "실험 시작하기",
+      on_load: function () {
+        // 버튼 아래에 안내 문구 추가
+        const btn = document.querySelector('#jspsych-survey-html-form-next');
+        if (btn) {
+          btn.style.marginTop = "60px";   // 위 질문들과 충분히 간격
+          
+          const note = document.createElement('p');
+          note.className = 'consent-text';
+          note.style.marginTop = '12px';
+          note.style.fontWeight = '600';
+          note.innerHTML =
+            '* 중간에 나가시면 저장이 안됩니다. 한번에 끝까지 진행해 주세요!<br>' +
+            '* 조용한 곳에서 가장 편한 방법으로 들어주세요.<br>' +
+            '* 너무 오래 생각하지 마시고 직관적으로 평가해 주세요.';
+          btn.insertAdjacentElement('afterend', note);
+        }
+      },
+      on_finish: function (data) {
+        const resp = data.response || {};
+        jsPsych.data.addProperties({
+          bio_sex: resp.bio_sex || null,
+          age: resp.age || null,
+          time: resp.time || null,
+          major_status: resp.major_status || null,
         });
       },
+    };
+
+    // -----------------------------
+    // 2. 자극 목록 준비
+    // -----------------------------
+    const emotionGroups = ["calm", "cheerful", "dreamy", "energetic", "love", "sad", "tense"];
+
+    let stimuli = [];
+    let seqCounter = 1;
+
+    emotionGroups.forEach((em) => {
+      ["C", "S"].forEach((tag) => {
+        for (let i = 1; i <= 5; i++) {
+          const num = String(i).padStart(2, "0");
+          stimuli.push({
+            file: `stims/${em}_${tag}${num}.mp3`,
+            base_emotion: em,
+            variant: `${tag}${num}`,
+            seq: seqCounter,
+          });
+          seqCounter++;
+        }
+      });
     });
 
-    const subject_id = jsPsych.randomization.randomID(10);
-    jsPsych.data.addProperties({ subject_id });
+    // 랜덤 순서
+    stimuli = jsPsych.randomization.shuffle(stimuli);
 
-    /* ---------------- 종료 버튼 화면 ---------------- */
+    // seq 다시 부여
+    stimuli.forEach((s, idx) => {
+      s.seq = idx + 1;
+    });
+
+    const TOTAL_TRIALS = stimuli.length; // 70
+
+    // -----------------------------
+    // 3. 감정 슬라이더 라벨
+    // -----------------------------
+    const sliderEmotions = [
+      { code: "cheerful", label: "즐거운 (cheerful)" },
+      { code: "energetic", label: "에너지가 넘치는 (energetic)" },
+      { code: "in_love", label: "사랑에 빠진 (in love)" },
+      { code: "dreamy", label: "꿈꾸는 듯한 (dreamy)" },
+      { code: "calm", label: "평온한 (calm)" },
+      { code: "sad", label: "슬픈 (sad)" },
+      { code: "tense", label: "불안한 (tense)" },
+    ];
+
+    // -----------------------------
+    // 4. 한 곡당 한 화면 trial
+    // -----------------------------
+    const song_trial = {
+      type: jsPsychSurveyHtmlForm,
+      html: function () {
+        const file = jsPsych.timelineVariable("file");
+        const idx = jsPsych.timelineVariable("seq");
+
+        const progressHTML = `
+          <div class="progress-text">
+            곡 ${idx} / ${TOTAL_TRIALS}
+          </div>
+        `;
+
+        let sliderHTML = "";
+        sliderEmotions.forEach((em) => {
+          sliderHTML += `
+            <div class="slider-row">
+              <div><strong>${em.label}</strong></div>
+              <div class="slider-wrap">
+                <input type="range"
+                       name="${em.code}"
+                       min="0" max="100" step="1" value="0" />
+                <div class="mid-tick"></div>
+              </div>
+              <div class="slider-label-line">
+                <span>전혀 느껴지지 않음 (0)</span>
+                <span>매우 강하게 느껴짐 (100)</span>
+              </div>
+            </div>
+          `;
+        });
+
+        const valenceSlider = `
+          <div class="slider-row">
+            <div><strong>Valence (정서가)</strong></div>
+            <div class="slider-wrap">
+              <input type="range" name="valence" min="0" max="100" step="1" value="50" />
+              <div class="mid-tick"></div>
+            </div>
+            <div class="slider-label-line">
+              <span>매우 부정적인 (0)</span>
+              <span>매우 긍정적인 (100)</span>
+            </div>
+          </div>
+        `;
+
+        const arousalSlider = `
+          <div class="slider-row">
+            <div><strong>Arousal (각성도)</strong></div>
+            <div class="slider-wrap">
+              <input type="range" name="arousal" min="0" max="100" step="1" value="50" />
+              <div class="mid-tick"></div>
+            </div>
+            <div class="slider-label-line">
+              <span>매우 이완된, 차분한 (0)</span>
+              <span>매우 각성된, 강렬한 (100)</span>
+            </div>
+          </div>
+        `;
+
+        return `
+          ${progressHTML}
+
+          <div class="top-instruction">
+            <p>아래의 <strong>Play</strong> 버튼을 누르시면 음악이 재생됩니다. 필요하면 여러 번 들으실 수 있습니다.</p>
+            <button type="button"
+                    onclick="document.getElementById('audio-${idx}').play()"
+                    class="jspsych-btn">
+              Play
+            </button>
+            <audio id="audio-${idx}" src="${file}" preload="auto"></audio>
+          </div>
+
+          <h3 style="text-align:center; margin-top:18px;">
+            음악을 들은 후, 아래의 <strong>감정 슬라이더</strong>와 <strong>Valence/Arousal</strong> 문항을 모두 평가해 주세요.
+          </h3>
+
+          <div class="trial-layout">
+            <div class="left-pane">
+              <fieldset>
+                <legend>1. 이 음악에서 느껴지는 각 감정의 강도</legend>
+                <p style="font-size:13px; margin-bottom:8px;">
+                  각 감정들이 느껴지는 만큼 슬라이더로 표현해 주세요.
+                </p>
+                ${sliderHTML}
+              </fieldset>
+            </div>
+
+            <div class="right-pane">
+              <fieldset>
+                <legend>2. Valence (정서가)</legend>
+                <p style="font-size:13px;">
+                  이 음악이 표현하는 감정의 정서가를 슬라이더로 표시해 주세요.
+                </p>
+                ${valenceSlider}
+              </fieldset>
+
+              <fieldset>
+                <legend>3. Arousal (각성도)</legend>
+                <p style="font-size:13px;">
+                  이 음악이 표현하는 감정의 각성도를 슬라이더로 표시해 주세요.
+                </p>
+                ${arousalSlider}
+              </fieldset>
+            </div>
+          </div>
+        `;
+      },
+      button_label: "다음 곡으로",
+      data: {
+        file: jsPsych.timelineVariable("file"),
+        base_emotion: jsPsych.timelineVariable("base_emotion"),
+        variant: jsPsych.timelineVariable("variant"),
+        seq: jsPsych.timelineVariable("seq"),
+      },
+
+      // ✅ 여기서 "Play를 한 번이라도 눌렀는지" 검사해서 아닌 경우 제출 막기
+      on_load: function () {
+        const idx   = jsPsych.timelineVariable("seq");
+        const audio = document.getElementById(`audio-${idx}`);
+        const nextBtn = document.getElementById("jspsych-survey-html-form-next");
+
+        let hasPlayed = false;
+
+        if (audio) {
+          // audio가 실제로 재생되면 플래그 true
+          audio.addEventListener("play", () => {
+            hasPlayed = true;
+          });
+        }
+
+        if (nextBtn) {
+          nextBtn.addEventListener("click", function (e) {
+            if (!hasPlayed) {
+              e.preventDefault();
+              e.stopPropagation();
+              alert("Play 버튼을 눌러 음악을 들어주시고, 감정 평가를 해주세요.");
+            }
+          });
+        }
+      },
+
+      on_finish: function (data) {
+        const resp = data.response || {};
+        sliderEmotions.forEach((em) => {
+          const val = resp[em.code];
+          data[em.code] = val !== undefined && val !== null ? Number(val) : null;
+        });
+        data.valence = resp.valence ? Number(resp.valence) : null;
+        data.arousal = resp.arousal ? Number(resp.arousal) : null;
+      },
+    };
+
+    const song_procedure = {
+      timeline: [song_trial],
+      timeline_variables: stimuli,
+      randomize_order: false,
+    };
+
+    // -----------------------------
+    // 6. 종료 화면
+    // -----------------------------
     const outro = {
       type: jsPsychHtmlButtonResponse,
       stimulus: `
         <h2>실험이 완료되었습니다.</h2>
+        <p>참여해 주셔서 감사합니다.</p>
         <p>종료 버튼을 누르면 응답이 저장됩니다.</p>
       `,
       choices: ["종료 (꼭 눌러주세요)"],
     };
 
-    /* ✅ 제출 완료 중앙 메시지 */
-    const submitted_screen = {
-      type: jsPsychHtmlButtonResponse,
-      stimulus: `
-        <div class="center-screen">
-          <div>
-            응답이 제출되었습니다.<br>
-            실험에 참여해 주셔서 감사합니다!
-          </div>
-        </div>
-      `,
-      choices: [],
-      trial_duration: 3000
-    };
-
-    /* (앞부분 start_screen / consent / demographics / song_procedure는
-       네가 준 코드 그대로 유지하면 됨) */
-
+    // -----------------------------
+    // 7. 전체 타임라인 실행
+    // -----------------------------
     jsPsych.run([
       start_screen,
       consent_human,
@@ -164,7 +836,6 @@
       demographics,
       song_procedure,
       outro,
-      submitted_screen   // ✅ 핵심
     ]);
   </script>
 </body>
