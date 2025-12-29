@@ -209,6 +209,12 @@
   <div id="jspsych-target"></div>
 
   <script>
+
+    // =============================
+// 🚫 NH 실험 마감 여부
+// =============================
+const EXPERIMENT_CLOSED = true;   // ← 여기만 true / false 로 관리
+
     // -----------------------------
     // 0. Google Apps Script 웹앱 URL
     // -----------------------------
@@ -829,14 +835,34 @@ const jsPsych = initJsPsych({
     // -----------------------------
     // 7. 전체 타임라인 실행
     // -----------------------------
-    jsPsych.run([
-      start_screen,
-      consent_human,
-      consent_payment,
-      demographics,
-      song_procedure,
-      outro,
-    ]);
+if (EXPERIMENT_CLOSED) {
+  document.getElementById("jspsych-target").innerHTML = `
+    <div style="
+      max-width: 700px;
+      margin: 120px auto;
+      text-align: center;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    ">
+      <h1 style="font-size: 26px; margin-bottom: 20px;">
+        음악 감정 평가 실험이 모두 마감되었습니다.
+      </h1>
+      <p style="font-size: 16px; line-height: 1.6;">
+        본 연구에 관심을 가져주셔서 감사합니다.<br>
+        현재 정상청(NH) 참여자 모집은 종료되었습니다.
+      </p>
+    </div>
+  `;
+} else {
+  jsPsych.run([
+    start_screen,
+    consent_human,
+    consent_payment,
+    demographics,
+    song_procedure,
+    outro,
+  ]);
+}
+
   </script>
 </body>
 </html>
